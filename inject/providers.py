@@ -1,6 +1,8 @@
 # dependency injector with Composition
 from functools import partial
 
+from inject.exceptions import ProvideObjectError, ProvideObjectAttributeError
+
 
 class Provider:
     def __init__(self, object_class, **kwargs):
@@ -12,13 +14,17 @@ class Provider:
         self._provide = partial(self.object_class, **self.arguments)
 
     def __str__(self):
-        return "object"
+        return f"Provider<{self.object_class.__class__}>"
 
     def provide(self):
         resolved = {k: v.provide() for k, v in self.dependencies.items()}
         resolved_provide = partial(self._provide, **resolved)
-        print('created an object! ', str(self.__class__))
-        return resolved_provide()
+        try:
+            provided = resolved_provide()
+            print('created an object! ', str(self.__class__))
+            return provided
+        except TypeError as error:
+            raise ProvideObjectError(message=str(error)) from error
 
     def __call__(self):
         return self.provide()
@@ -26,8 +32,10 @@ class Provider:
     def __getattr__(self, item):
         def get_attribute_workaround(custom_object, attribute_name):
             return getattr(custom_object, attribute_name)
-
-        return get_attribute_workaround(self.provide(), item)
+        try:
+            return get_attribute_workaround(self.provide(), item)
+        except AttributeError as error:
+            raise ProvideObjectAttributeError(message=str(error)) from error
 
 
 class SingletonProvider(Provider):
