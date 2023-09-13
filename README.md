@@ -1,6 +1,9 @@
 # Inject, a dependency injection framework for Python projects
 
 Read me!
+To build the library use:
+- python setup.py bdist_wheel
+
 
 # TODO
 * if possible implement cooler getters for providers

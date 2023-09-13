@@ -16,4 +16,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.10',
     ],
+    tests_require=['pytest==7.4.0'],
+    test_suite='tests',
+
 )
